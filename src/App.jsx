@@ -1,33 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+// import React from 'react';
+import { Link } from 'react-router-dom';
 import './App.css'
+import Navbar from './components/Navbar';
+import genericbanner from './assets/genericbanner.jpg'
+import PdtDisplayCSS from './components/PdtDisplay.module.css';
+import PdtDisplayCard from './components/PdtDisplayCard';
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const fakestoreURL = 'https://fakestoreapi.com/products'
+  const [products, setProducts] = useState([]); 
+  const [apiFetch, setApiFetch] = useState(false); 
+  const [cart, setCart] = useState([]); 
+  
+
+  useEffect( () => {
+  fetch(fakestoreURL)
+    .then((response) => {
+      return response.json(); 
+    })
+    .then((data) => {
+      setProducts(data);
+      setApiFetch(true); 
+    })
+  },[]); 
+
+  useEffect( () => {
+    console.log(products); 
+  }, [products]); 
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+        <Navbar currentCart={cart}/>
+        <div className='mainpage'>
+          <div className='mainHero'>
+            <img className='hero' src={genericbanner} alt='image'></img>
+          </div>
+          <div className='pdtTitle'>
+            <h1>View Our Products</h1>
+          </div>
+          <div className={PdtDisplayCSS.pdtList}>
+            { apiFetch ?
+              products.map((product) => {
+                return (
+                  <PdtDisplayCard key={product.id} toDisplay={product} currentCart={cart}/>
+                )
+              }) 
+                : (
+                    <p>Please Wait... </p>
+                ) 
+
+              }
+          </div>
+        </div>
     </>
   )
 }
